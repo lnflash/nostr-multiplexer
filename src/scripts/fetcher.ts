@@ -6,6 +6,8 @@ import {
   Relay,
   Filter,
 } from "nostr-tools";
+
+import { WebSocketClient } from "./queryClient";
 useWebSocketImplementation(require("ws"));
 
 const relays = [

@@ -1,7 +1,10 @@
-class WebSocketClient {
+const WebSocket = require("ws");
+
+export class WebSocketClient {
   url: string;
   socket: WebSocket;
   handleEvent: (subscriptionId: string, event: any) => void;
+  isSocketOpen: boolean;
 
   constructor(
     url: string,
@@ -10,9 +13,11 @@ class WebSocketClient {
     this.url = url;
     this.socket = new WebSocket(url);
     this.handleEvent = handleEvent;
+    this.isSocketOpen = false;
 
     this.socket.onopen = () => {
       console.log("WebSocket connected");
+      this.isSocketOpen = true;
     };
 
     this.socket.onmessage = (event) => {
@@ -22,19 +27,29 @@ class WebSocketClient {
 
     this.socket.onclose = (event) => {
       console.log("WebSocket closed:", event.reason);
+      this.isSocketOpen = false;
     };
 
     this.socket.onerror = (error) => {
       console.error("WebSocket error:", error);
+      this.isSocketOpen = false;
     };
   }
 
   subscribe(subscriptionId: string, filters: any) {
+    if (!this.isSocketOpen) {
+      console.error("WebSocket is not open");
+      return;
+    }
     const message = ["REQ", subscriptionId, filters];
     this.socket.send(JSON.stringify(message));
   }
 
   unsubscribe(subscriptionId: string) {
+    if (!this.isSocketOpen) {
+      console.error("WebSocket is not open");
+      return;
+    }
     const message = ["CLOSE", subscriptionId];
     this.socket.send(JSON.stringify(message));
   }

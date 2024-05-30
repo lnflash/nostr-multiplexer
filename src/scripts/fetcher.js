@@ -37,42 +37,34 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var nostr_tools_1 = require("nostr-tools");
+var queryClient_1 = require("./queryClient");
 (0, nostr_tools_1.useWebSocketImplementation)(require("ws"));
 var relays = [
     "wss://relay.damus.io",
     "wss://relay.primal.net",
     "wss://relay.snort.social",
 ];
+var handleEvent = function (subscriptionId, event) {
+    console.log("Handling event", event);
+    // Store the event in your own array or perform any other necessary actions
+};
 var FLASH_RELAYS = ["wss://relay.staging.flashapp.me"];
 var delay = function (ms) { return new Promise(function (resolve) { return setTimeout(resolve, ms); }); };
-var queryRelays = function (pubKeyStart, relayUrl) { return __awaiter(void 0, void 0, void 0, function () {
-    var relay, events, filter, sub;
+var queryPubkey = function (pubKeyStart, client, subscriptionId) { return __awaiter(void 0, void 0, void 0, function () {
+    var events, filter, filters;
     return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, nostr_tools_1.Relay.connect(relayUrl)];
-            case 1:
-                relay = _a.sent();
-                console.log("Fetching all events with", pubKeyStart);
-                events = [];
-                filter = {
-                    kinds: [0],
-                    authors: [pubKeyStart],
-                };
-                console.log("starting fetch with filter", filter);
-                sub = relay.subscribe([filter], {
-                    onevent: function (event) {
-                        console.log("got event", event);
-                        // events.push(event);
-                    },
-                    oneose: function () {
-                        sub.close();
-                    },
-                    onclose: function (reason) {
-                        console.log("reasons is", reason);
-                    },
-                });
-                return [2 /*return*/, events];
-        }
+        console.log("Fetching all events with", pubKeyStart);
+        events = [];
+        filter = {
+            kinds: [0],
+            authors: [pubKeyStart],
+        };
+        console.log("starting fetch with filter", filter);
+        filters = {
+            kinds: [0],
+        };
+        client.subscribe(subscriptionId, filters);
+        return [2 /*return*/, events];
     });
 }); };
 var pushToFlashRelays = function (events, pool) { return __awaiter(void 0, void 0, void 0, function () {
@@ -97,24 +89,20 @@ var pushToFlashRelays = function (events, pool) { return __awaiter(void 0, void 
     });
 }); };
 var fetchEvents = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var pool;
     return __generator(this, function (_a) {
-        pool = new nostr_tools_1.SimplePool();
         relays.forEach(function (relay) { return __awaiter(void 0, void 0, void 0, function () {
-            var i, hexValue;
+            var client, subscriptionId, i, hexValue;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
+                        client = new queryClient_1.WebSocketClient(relay, handleEvent);
+                        subscriptionId = "my-subscription";
                         i = 0;
                         _a.label = 1;
                     case 1:
                         if (!(i < 256)) return [3 /*break*/, 4];
                         hexValue = i.toString(16).padStart(2, "0");
-                        queryRelays(hexValue, relay).then(function (events) {
-                            console.log("GOT EVENTS", events);
-                        }, function (reasons) {
-                            console.log("got error", reasons);
-                        });
+                        queryPubkey(hexValue, client, subscriptionId);
                         // await pushToFlashRelays(events, pool);
                         return [4 /*yield*/, delay(5000)];
                     case 2:
@@ -124,12 +112,13 @@ var fetchEvents = function () { return __awaiter(void 0, void 0, void 0, functio
                     case 3:
                         i++;
                         return [3 /*break*/, 1];
-                    case 4: return [2 /*return*/];
+                    case 4:
+                        client.unsubscribe("my-subscription");
+                        return [2 /*return*/];
                 }
             });
         }); });
         console.log("Fetch complete");
-        pool.close(relays);
         return [2 /*return*/];
     });
 }); };
