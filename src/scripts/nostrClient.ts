@@ -1,6 +1,6 @@
 const WebSocket = require("ws");
 
-export class WebSocketClient {
+export class NostrClient {
   url: string;
   socket: WebSocket;
   handleEvent: (subscriptionId: string, event: any) => void;
@@ -69,6 +69,15 @@ export class WebSocketClient {
       default:
         console.warn("Unknown message type:", messageType);
     }
+  }
+
+  publishEvent(event: any) {
+    if (!this.isSocketOpen) {
+      console.error("WebSocket is not open");
+      return;
+    }
+    const message = ["EVENT", event];
+    this.socket.send(JSON.stringify(message));
   }
 
   handleEOSE(subscriptionId: string) {
