@@ -1,11 +1,4 @@
-import { rejects } from "assert";
-import {
-  SimplePool,
-  Event,
-  useWebSocketImplementation,
-  Relay,
-  Filter,
-} from "nostr-tools";
+import { Filter } from "nostr-tools";
 
 import { NostrClient } from "./nostrClient";
 
@@ -59,7 +52,6 @@ const fetchEvents = async () => {
     client.unsubscribe("my-subscription");
   });
   console.log("Fetch complete");
-  //pool.close(FLASH_RELAYS);
 };
 
 function main() {
