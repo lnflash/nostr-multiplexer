@@ -10,15 +10,13 @@ const relays = [
 
 const FLASH_RELAY = "wss://relay.staging.flashapp.me";
 
-const FlashClient = new NostrClient(FLASH_RELAY, (event: any) => {
+const FlashClient = new NostrClient(FLASH_RELAY, (event: string) => {
   console.log("GOT EVENT", event);
 });
 
-const handleEvent = function (subscriptionId: string, event: any) {
+const handleEvent = function (subscriptionId: string, event: string) {
   console.log("Handling event", event);
-  delay(1000).then((value) => {
-    FlashClient.publishEvent(event);
-  });
+  FlashClient.publishEvent(event);
 };
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -34,7 +32,7 @@ const queryPubkey = async (
     authors: [pubKeyStart],
   };
   console.log("starting fetch with filter", filter);
-  const filters = {
+  const filters: Filter = {
     kinds: [0],
   };
   client.subscribe(subscriptionId, filters);
@@ -42,14 +40,15 @@ const queryPubkey = async (
 
 const fetchEvents = async () => {
   relays.forEach(async (relay) => {
-    const client = new NostrClient(relay, handleEvent);
+    const queryClient = new NostrClient(relay, handleEvent);
     const subscriptionId = "my-subscription";
+    //loop over hex values 00 to ff. (Fetch all pubkeys, but in batches)
     for (let i = 0; i < 256; i++) {
       const hexValue = i.toString(16).padStart(2, "0");
-      queryPubkey(hexValue, client, subscriptionId);
+      queryPubkey(hexValue, queryClient, subscriptionId);
       await delay(5000); // Wait for 5 seconds
     }
-    client.unsubscribe("my-subscription");
+    queryClient.unsubscribe("my-subscription");
   });
   console.log("Fetch complete");
 };

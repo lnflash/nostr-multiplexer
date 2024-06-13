@@ -1,14 +1,16 @@
+import { Event, Filter } from "nostr-tools";
+
 const WebSocket = require("ws");
 
 export class NostrClient {
   url: string;
   socket: WebSocket;
-  handleEvent: (subscriptionId: string, event: any) => void;
+  handleEvent: (subscriptionId: string, event: string) => void;
   isSocketOpen: boolean;
 
   constructor(
     url: string,
-    handleEvent: (subscriptionId: string, event: any) => void
+    handleEvent: (subscriptionId: string, event: string) => void
   ) {
     this.url = url;
     this.socket = new WebSocket(url);
@@ -36,7 +38,7 @@ export class NostrClient {
     };
   }
 
-  subscribe(subscriptionId: string, filters: any) {
+  subscribe(subscriptionId: string, filters: Filter) {
     if (!this.isSocketOpen) {
       console.error("WebSocket is not open");
       return;
@@ -54,7 +56,7 @@ export class NostrClient {
     this.socket.send(JSON.stringify(message));
   }
 
-  handleMessage(message: any) {
+  handleMessage(message: string[]) {
     const messageType = message[0];
     switch (messageType) {
       case "EVENT":
