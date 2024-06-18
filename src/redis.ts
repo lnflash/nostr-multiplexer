@@ -15,6 +15,16 @@ console.log(
   process.env.REDIS_HOST,
   process.env.REDIS_PORT
 );
+
+(async () => {
+  // Connect to redis server
+  await redisClient.connect();
+})();
+
+redisClient.on("connect", () => {
+  console.log("Redis client connected");
+});
+
 redisClient.on("error", (err: any) => {
   console.error("Redis error: ", err);
 });

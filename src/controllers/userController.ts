@@ -5,6 +5,7 @@ const registerUser = async (req: Request, res: Response) => {
   const { userId } = req.body;
 
   try {
+    console.log("initiating request", userId);
     const result = await userService.registerUser(userId);
     console.log("Got result");
     res.status(200).json(result);

@@ -8,6 +8,7 @@ const registerUser = (userId: string): Promise<{ message: string }> => {
     }
 
     redisClient.sAdd("registeredUserIds", userId);
+    resolve({ message: "added" });
   });
 };
 
