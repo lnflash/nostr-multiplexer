@@ -1,7 +1,5 @@
-// src/index.ts
 import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
-import userController from "./controllers/userController";
 import dbPromise from "./db/db";
 import userRoutes from "./routes/users";
 
@@ -14,8 +12,7 @@ app.use(express.json()); // Parse JSON request bodies
 
 app.use("/", userRoutes);
 
-app.post("/register", userController.registerUser);
-//app.post("/.well-known/nostr.json", userController.wellKnown);
+// app.post("/register", userController.registerUser);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Watchamacallit? I don't know");

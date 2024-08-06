@@ -3,7 +3,7 @@ import { getAllUsers, addUser, getPubkeyByName } from "../db/queries";
 
 const router = Router();
 
-router.get("/", async (req, res) => {
+router.get("/all", async (req, res) => {
   try {
     const users = await getAllUsers();
     res.json(users);
