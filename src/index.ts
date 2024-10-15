@@ -1,6 +1,5 @@
 import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
-import dbPromise from "./db/db";
 import userRoutes from "./routes/users";
 
 dotenv.config();
@@ -15,16 +14,8 @@ app.use("/", userRoutes);
 // app.post("/register", userController.registerUser);
 
 app.get("/", (req: Request, res: Response) => {
-  res.send("Watchamacallit? I don't know");
+  res.send("Watchamacallit?");
 });
-
 app.listen(port, async () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);
-  // Ensure schema is set up
-  try {
-    await dbPromise; // Ensure the database connection is established
-    console.log("Database connection established.");
-  } catch (err) {
-    console.error("Error connecting to the database:", err);
-  }
 });

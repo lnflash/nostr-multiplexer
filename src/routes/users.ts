@@ -1,16 +1,8 @@
 import { Router } from "express";
-import { getAllUsers, addUser, getPubkeyByName } from "../db/queries";
+import { getPubkeyByName } from "../repository/queries";
+import { nip19 } from "nostr-tools";
 
 const router = Router();
-
-router.get("/all", async (req, res) => {
-  try {
-    const users = await getAllUsers();
-    res.json(users);
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-});
 
 router.get("/.well-known/nostr.json", async (req, res) => {
   const name = req.query.name as string;
@@ -20,28 +12,17 @@ router.get("/.well-known/nostr.json", async (req, res) => {
   }
 
   try {
-    const user = await getPubkeyByName(name);
+    const npub = await getPubkeyByName(name);
 
-    if (user) {
+    if (npub) {
       res.json({
         names: {
-          [user.name]: user.pubkey,
+          [name]: nip19.decode(npub).data as string,
         },
       });
     } else {
       res.status(404).json({ error: "User not found" });
     }
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-router.post("/users", async (req, res) => {
-  const { name, pubkey } = req.body;
-  if (pubkey.length !== 64) throw Error("Pubkey is wrong length");
-  try {
-    const id = await addUser(name, pubkey);
-    res.json({ id });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
