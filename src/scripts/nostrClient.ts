@@ -1,4 +1,4 @@
-import { Event, Filter } from "nostr-tools";
+import { Filter } from "nostr-tools";
 
 const WebSocket = require("ws");
 
