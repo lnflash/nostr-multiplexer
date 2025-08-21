@@ -13,8 +13,8 @@ app.use("/", userRoutes);
 
 // app.post("/register", userController.registerUser);
 
-app.get("/ping", (req: Request, res: Response) => {
-  res.send("pong");
+app.get("/", (req: Request, res: Response) => {
+  res.send("Watchamacallit?");
 });
 app.listen(port, async () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);
