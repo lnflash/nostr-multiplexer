@@ -1,5 +1,4 @@
 import axios from "axios";
-import config from "../../config/config";
 
 interface User {
   name: string;
@@ -20,7 +19,7 @@ export const getPubkeyByName = async (name: string): Promise<string | null> => {
   };
   try {
     const response = await axios.post(
-      config.GRAPHQL_URL,
+      "https://api.flashapp.me/graphql",
       {
         query,
         variables,
