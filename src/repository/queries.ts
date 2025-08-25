@@ -7,6 +7,7 @@ interface User {
 }
 
 export const getPubkeyByName = async (name: string): Promise<string | null> => {
+  if (!config.GRAPHQL_URL) throw Error("MISSING GRAPHQL_URL");
   const query = `
   query Query($username: Username!) {
     npubByUsername(username: $username) {
