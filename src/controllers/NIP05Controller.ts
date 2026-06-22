@@ -1,10 +1,11 @@
 import {Request, Response} from 'express';
 import {getPubkeyByName} from '../repository/queries';
 import {nip19} from 'nostr-tools';
+import {MAX_NAME_LENGTH} from '../constants';
 
 // Conservative NIP-05 username validation: lowercase alphanumeric + _ . -
-// Max 64 chars per NIP-05 spec
-const VALID_NAME = /^[a-z0-9_.-]{1,64}$/;
+// Length bounded by the shared MAX_NAME_LENGTH (NIP-05 spec).
+const VALID_NAME = new RegExp(`^[a-z0-9_.-]{1,${MAX_NAME_LENGTH}}$`);
 
 // Short-Term cache to prevent abuse via repeated lookups
 // TTL: 60 seconds, max 1000 entries
@@ -26,16 +27,15 @@ const pruneCache = () => {
     }
   }
 
-  // If still over limit, evict oldest entries
-  if (cache.size > CACHE_MAX) {
-    const sorted = [...cache.entries()].sort(
-      (a, b) => a[1].expires - b[1].expires,
-    );
-    const toRemove = cache.size - CACHE_MAX;
-
-    for (let i = 0; i < toRemove; i++) {
-      cache.delete(sorted[i][0]);
+  // If still over limit, evict oldest-inserted entries. Map preserves insertion
+  // order and TTL is constant, so insertion order == expiry order — no sort needed.
+  let toRemove = cache.size - CACHE_MAX;
+  for (const key of cache.keys()) {
+    if (toRemove <= 0) {
+      break;
     }
+    cache.delete(key);
+    toRemove--;
   }
 };
 

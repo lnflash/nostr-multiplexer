@@ -1,8 +1,6 @@
 import axios from 'axios';
 import config from '../../config/config';
-
-// Max username length (NIP-05 spec)
-const MAX_NAME_LENGTH = 64;
+import {MAX_NAME_LENGTH} from '../constants';
 
 export const getPubkeyByName = async (
   name: string,

@@ -1,7 +1,6 @@
 type Env = 'staging' | 'production' | 'test';
 
 type Config = {
-  env: Env;
   GRAPHQL_URL: string;
   PORT: number;
   // How many proxy hops to trust for client-IP derivation (used by the rate
@@ -28,21 +27,18 @@ const PORT = Number(process.env.PORT) || 4000;
 const parseTrustProxy = (
   raw: string | undefined,
 ): boolean | number | string => {
-  if (raw === undefined || raw === '') {
+  if (!raw || raw === 'false') {
     return false;
   }
   if (raw === 'true') {
     return true;
   }
-  if (raw === 'false') {
-    return false;
-  }
+  // Numeric hop count (e.g. '1'); '0' stays numeric — Express reads it as "trust none".
   const n = Number(raw);
   return Number.isNaN(n) ? raw : n;
 };
 
 const config: Config = {
-  env,
   GRAPHQL_URL,
   PORT,
   TRUST_PROXY: parseTrustProxy(process.env.TRUST_PROXY),
