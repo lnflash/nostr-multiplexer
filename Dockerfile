@@ -1,22 +1,35 @@
-# Use Node.js 20 version as base image
-FROM node:20-alpine
+# Build stage
+FROM node:20-alpine AS builder
 
-# Set the working directory
 WORKDIR /app
 
-# Copy package.json and yarn.lock
 COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile
 
-# Install dependencies
-RUN yarn install
+COPY tsconfig.json ./
+COPY src/ ./src/
+COPY config/ ./config/
 
-COPY . /app/
-
-# Copy built TypeScript files
 RUN yarn build
 
-# Expose port 3000
+# Production stage
+FROM node:20-alpine AS production
+
+WORKDIR /app
+
+# Install only production dependencies
+COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile --production && \
+    yarn cache clean
+
+# Copy built files from builder
+COPY --from=builder /app/dist ./dist
+
+# Run as non-root user
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001
+USER nodejs
+
 EXPOSE 4000
 
-# Command to run the server
-CMD ["node", "./dist/src/index.js"]
+CMD ["node", "dist/src/index.js"]

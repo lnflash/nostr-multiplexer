@@ -1,6 +1,10 @@
-type Env = "staging" | "production" | "test";
+type Env = 'staging' | 'production' | 'test';
 
-const configData = {
+type Config = {
+  GRAPHQL_URL: string | undefined;
+};
+
+const configData: Record<Env, Config> = {
   staging: {
     GRAPHQL_URL: process.env.GRAPHQL_URL,
   },
@@ -11,7 +15,8 @@ const configData = {
     GRAPHQL_URL: process.env.GRAPHQL_URL,
   },
 };
-const env = (process.env.NODE_ENV as Env) || "test";
+
+const env = (process.env.NODE_ENV as Env) || 'production';
 const config = configData[env];
 
 if (!config) {
