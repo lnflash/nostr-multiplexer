@@ -14,7 +14,7 @@ vi.mock('../config/config', () => ({
   default: {GRAPHQL_URL: 'http://test-graphql:4000/graphql'},
 }));
 
-import {getNip05} from '../src/controllers/NIP05Controller';
+import {getNip05, resetStateForTests} from '../src/controllers/NIP05Controller';
 
 const createApp = () => {
   const app = express();
@@ -34,6 +34,7 @@ vi.mock('nostr-tools', () => ({
 describe('NIP-05 Controller', () => {
   beforeEach(() => {
     mockGetPubkeyByName.mockReset();
+    resetStateForTests();
     vi.useRealTimers();
   });
 
@@ -109,21 +110,41 @@ describe('NIP-05 Controller', () => {
     expect(res.body.error).not.toContain('GraphQL down');
   });
 
-  it('enforces rate limiting after threshold', async () => {
+  it('enforces rate limiting at the 60-request boundary', async () => {
     mockGetPubkeyByName.mockResolvedValue(null);
     const app = createApp();
 
-    // Send requests up to the limit (60 per minute)
-    let lastStatus = 200;
-
-    for (let i = 0; i < 62; i++) {
+    // The first 60 requests are allowed (404 = passed the limiter, not found).
+    for (let i = 0; i < 60; i++) {
       const res = await request(app).get(
         `/.well-known/nostr.json?name=user${i}`,
       );
+      expect(res.status).toBe(404);
+    }
+
+    // The 61st request from the same client is rate limited.
+    const limited = await request(app).get(
+      '/.well-known/nostr.json?name=onemore',
+    );
+    expect(limited.status).toBe(429);
+    expect(limited.headers['retry-after']).toBe('60');
+  });
+
+  it('cannot be bypassed by spoofing X-Forwarded-For', async () => {
+    mockGetPubkeyByName.mockResolvedValue(null);
+    const app = createApp();
+
+    // Without `trust proxy` configured, req.ip is the socket address regardless
+    // of the X-Forwarded-For header, so a client rotating spoofed XFF values
+    // stays in a single rate-limit bucket and is still throttled.
+    let lastStatus = 200;
+    for (let i = 0; i < 61; i++) {
+      const res = await request(app)
+        .get(`/.well-known/nostr.json?name=user${i}`)
+        .set('X-Forwarded-For', `10.0.0.${i}`);
       lastStatus = res.status;
     }
 
-    // The 62nd should be rate limited (61st and 62nd)
     expect(lastStatus).toBe(429);
   });
 });

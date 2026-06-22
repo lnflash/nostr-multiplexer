@@ -73,12 +73,19 @@ const checkRateLimit = (ip: string): boolean => {
   return true;
 };
 
+// Test-only: clear in-process rate-limit + cache state so suites are not
+// order-dependent on shared module singletons.
+export const resetStateForTests = () => {
+  ipHits.clear();
+  cache.clear();
+};
+
 export const getNip05 = async (req: Request, res: Response) => {
-  // Rate limit check
-  const clientIp =
-    (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() ||
-    req.socket.remoteAddress ||
-    'unknown';
+  // Rate limit check.
+  // Use req.ip, which Express derives from the trusted-proxy chain
+  // (app.set('trust proxy', ...)). Do NOT read X-Forwarded-For directly — that
+  // header is client-controlled and trivially spoofed to bypass the limiter.
+  const clientIp = req.ip ?? 'unknown';
 
   if (!checkRateLimit(clientIp)) {
     res.setHeader('Retry-After', '60');

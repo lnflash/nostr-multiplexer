@@ -32,4 +32,8 @@ USER nodejs
 
 EXPOSE 4000
 
+# Liveness/readiness probe against the built-in /ready endpoint.
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget -qO- http://localhost:4000/ready || exit 1
+
 CMD ["node", "dist/src/index.js"]

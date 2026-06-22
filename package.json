@@ -9,6 +9,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.2",
+    "helmet": "^8.2.0",
     "nostr-tools": "^2.10.0",
     "ws": "^8.18.0"
   },
@@ -16,13 +17,13 @@
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.0",
     "@types/node": "^22.0.0",
+    "@types/supertest": "^6.0.2",
     "@types/ws": "^8.5.13",
     "nodemon": "^3.1.0",
+    "supertest": "^7.0.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.4",
-    "vitest": "^2.1.0",
-    "supertest": "^7.0.0",
-    "@types/supertest": "^6.0.2"
+    "vitest": "^2.1.0"
   },
   "scripts": {
     "build": "tsc",
@@ -30,5 +31,8 @@
     "dev": "nodemon src/index.ts",
     "test": "vitest run",
     "test:watch": "vitest"
+  },
+  "engines": {
+    "node": ">=20 <23"
   }
 }

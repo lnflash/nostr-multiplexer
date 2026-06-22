@@ -24,4 +24,12 @@ jobs:
 
       - run: yarn test
 
+      # Gate: fail the build on high/critical advisories in PRODUCTION deps
+      # (the only deps shipped in the runtime image).
       - run: yarn audit --groups dependencies --level high
+
+      # Report-only: surface high/critical advisories across ALL deps
+      # (incl. devDependencies) without blocking. Remove the `|| true` once the
+      # dev toolchain is clean to make this gating too.
+      - name: Audit all dependencies (report only)
+        run: yarn audit --level high || true
