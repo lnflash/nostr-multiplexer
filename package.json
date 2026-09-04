@@ -1,31 +1,38 @@
 {
-  "name": "watchamacallit",
-  "version": "0.0.1",
-  "main": "index.js",
+  "name": "nostr-multiplexer",
+  "version": "0.2.0",
+  "main": "dist/src/index.js",
   "author": "abhay-raizada <toabhayraizada@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "@types/redis": "^4.0.11",
-    "@types/ws": "^8.5.10",
-    "axios": "^1.7.7",
+    "axios": "^1.18.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
-    "express": "^4.19.2",
-    "nostr-tools": "^2.7.2",
-    "ws": "^8.17.0"
+    "express": "^4.21.2",
+    "helmet": "^8.2.0",
+    "nostr-tools": "^2.10.0",
+    "ws": "^8.18.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
-    "@types/express": "^4.17.21",
+    "@types/express": "^5.0.0",
     "@types/node": "^22.0.0",
+    "@types/supertest": "^6.0.2",
+    "@types/ws": "^8.5.13",
     "nodemon": "^3.1.0",
-    "npm": "^10.6.0",
+    "supertest": "^7.0.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.5.4"
+    "typescript": "^5.5.4",
+    "vitest": "^2.1.0"
   },
   "scripts": {
-    "build": "npx tsc",
-    "start": "npx tsc; node dist/src/index.js",
-    "dev": "nodemon src/index.ts"
+    "build": "tsc",
+    "start": "node dist/src/index.js",
+    "dev": "nodemon src/index.ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "engines": {
+    "node": ">=20 <23"
   }
 }
