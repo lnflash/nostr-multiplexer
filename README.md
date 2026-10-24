@@ -2,7 +2,7 @@
 
 Nostr infrastructure service for the Flash platform. Provides NIP-05 identity lookups backed by the Flash GraphQL API.
 
-Live on `flashapp.me` — serves `/.well-known/nostr.json` for all Flash users with `@flashapp.me` NIP-05 identifiers.
+Live on `flashapp.me`. It serves `/.well-known/nostr.json` for all Flash users with `@flashapp.me` NIP-05 identifiers.
 
 ## Endpoints
 
@@ -11,7 +11,7 @@ Live on `flashapp.me` — serves `/.well-known/nostr.json` for all Flash users w
 NIP-05 username-to-pubkey resolution.
 
 **Query params:**
-- `name` — username to look up (lowercase alphanumeric, max 64 chars)
+- `name`: username to look up (lowercase alphanumeric, max 64 chars)
 
 **Response (200):**
 ```json
@@ -41,7 +41,7 @@ Readiness check. Returns 200 if `GRAPHQL_URL` is configured, 503 otherwise.
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `GRAPHQL_URL` | Yes | — | Flash GraphQL endpoint URL |
+| `GRAPHQL_URL` | Yes | n/a | Flash GraphQL endpoint URL |
 | `PORT` | No | `4000` | HTTP listen port |
 | `NODE_ENV` | No | `production` | Environment selector |
 
